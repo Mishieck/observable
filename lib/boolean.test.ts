@@ -9,6 +9,12 @@ describe("$Boolean", () => {
     expect(Boolean(observableBoolean.current)).toEqual(true);
   });
 
+  it("should convert to primitive value", () => {
+    const observableBoolean = new $Boolean(true);
+    const primitiveBoolean = observableBoolean.toPrimitive();
+    expect(primitiveBoolean).toEqual(true);
+  });
+
   it("should observe boolean", () => {
     const observableBoolean = new $Boolean(true);
     let current = observableBoolean.current;

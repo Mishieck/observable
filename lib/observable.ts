@@ -7,6 +7,12 @@ export type ObservableInterface<Value> = {
   notifyObservers: (value: Value) => void;
 };
 
+export type ObservablePrimitiveInterface<Value, PrimitiveValue> =
+  & ObservableInterface<Value>
+  & {
+    toPrimitive: () => PrimitiveValue;
+  };
+
 export class Observable<Value> implements ObservableInterface<Value> {
   private _current: Value;
   private observers = new Set<Observer<Value>>();

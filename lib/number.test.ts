@@ -9,6 +9,12 @@ describe("$Number", () => {
     expect(Number(observableNumber.current)).toEqual(1);
   });
 
+  it("should convert to primitive value", () => {
+    const observableNumber = new $Number(1);
+    const primitiveNumber = observableNumber.toPrimitive();
+    expect(primitiveNumber).toEqual(1);
+  });
+
   it("should observe number", () => {
     const observableNumber = new $Number(1);
     let current = observableNumber.current;

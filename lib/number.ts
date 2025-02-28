@@ -1,6 +1,7 @@
-import { Observable, ObservableInterface } from "./observable.ts";
+import { Observable, ObservablePrimitiveInterface } from "./observable.ts";
 
-export class $Number extends Number implements ObservableInterface<Number> {
+export class $Number extends Number
+  implements ObservablePrimitiveInterface<Number, number> {
   private observable: Observable<Number>;
 
   constructor(value: Number) {
@@ -14,6 +15,10 @@ export class $Number extends Number implements ObservableInterface<Number> {
 
   set current(value: Number) {
     this.observable.current = value;
+  }
+
+  toPrimitive() {
+    return Number(this);
   }
 
   get addObserver() {

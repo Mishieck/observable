@@ -1,6 +1,7 @@
-import { Observable, ObservableInterface } from "./observable.ts";
+import { Observable, ObservablePrimitiveInterface } from "./observable.ts";
 
-export class $Boolean extends Boolean implements ObservableInterface<Boolean> {
+export class $Boolean extends Boolean
+  implements ObservablePrimitiveInterface<Boolean, boolean> {
   private observable: Observable<Boolean>;
 
   constructor(value: Boolean | boolean) {
@@ -14,6 +15,10 @@ export class $Boolean extends Boolean implements ObservableInterface<Boolean> {
 
   set current(value: Boolean) {
     this.observable.current = value;
+  }
+
+  toPrimitive() {
+    return Boolean(this);
   }
 
   get addObserver() {
