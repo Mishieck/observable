@@ -1,32 +1,38 @@
-export type Observer<Value> = (value: Value) => void;
+export type Observer<Value> = (value: Value) => void | Promise<void>;
 
-export type Observable<Value> = {
-  $current: Value;
-  $addObserver: (observe: Observer<Value>) => void;
-  $removeObserver: (observe: Observer<Value>) => void;
-  $notifyObservers: (value: Value) => void;
+export type ObservableInterface<Value> = {
+  current: Value;
+  addObserver: (observe: Observer<Value>) => void;
+  removeObserver: (observe: Observer<Value>) => void;
+  notifyObservers: (value: Value) => void;
 };
 
-export class ObservableValue<Value> implements Observable<Value> {
-  $current;
-  #observers: Array<Observer<Value>> = [];
+export class Observable<Value> implements ObservableInterface<Value> {
+  private _current: Value;
+  private observers = new Set<Observer<Value>>();
 
   constructor(value: Value) {
-    this.$current = value;
+    this._current = value;
   }
 
-  $addObserver(observe: Observer<Value>) {
-    if (this.#observers.includes(observe)) return;
-    this.#observers.push(observe);
+  get current() {
+    return this._current;
   }
 
-  $removeObserver(observe: Observer<Value>) {
-    const index = this.#observers.indexOf(observe);
-    this.#observers.splice(index, 1);
+  set current(value: Value) {
+    this.notifyObservers(value);
   }
 
-  $notifyObservers(value: Value) {
-    this.$current = value;
-    for (const notify of this.#observers) notify(value);
+  addObserver(observe: Observer<Value>) {
+    if (!this.observers.has(observe)) this.observers.add(observe);
+  }
+
+  removeObserver(observe: Observer<Value>) {
+    this.observers.delete(observe);
+  }
+
+  notifyObservers(value: Value) {
+    this._current = value;
+    for (const notify of this.observers) notify(value);
   }
 }
