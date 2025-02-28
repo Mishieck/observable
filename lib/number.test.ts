@@ -25,7 +25,7 @@ describe("$Number", () => {
 
     expect(Number(current)).toEqual(1);
     observableNumber.addObserver(setCurrent);
-    observableNumber.notifyObservers(2);
+    observableNumber.current = 2;
     expect(current).toEqual(2);
   });
 
@@ -40,7 +40,7 @@ describe("$Number", () => {
     expect(Number(current)).toEqual(1);
     observableNumber.addObserver(setCurrent);
     observableNumber.removeObserver(setCurrent);
-    observableNumber.notifyObservers(2);
+    observableNumber.current = 2;
     expect(Number(current)).toEqual(1);
   });
 });

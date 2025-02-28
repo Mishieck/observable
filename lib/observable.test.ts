@@ -18,7 +18,7 @@ describe("ObservableValue", () => {
 
     expect(current).toEqual(true);
     observableBoolean.addObserver(setCurrent);
-    observableBoolean.notifyObservers(false);
+    observableBoolean.current = false;
     expect(current).toEqual(false);
   });
 
@@ -33,7 +33,7 @@ describe("ObservableValue", () => {
     expect(current).toEqual(true);
     observableBoolean.addObserver(setCurrent);
     observableBoolean.removeObserver(setCurrent);
-    observableBoolean.notifyObservers(false);
+    observableBoolean.current = false;
     expect(current).toEqual(true);
   });
 });
@@ -62,7 +62,7 @@ describe("Observable", () => {
 
     expect(current).toEqual({ id: "1" });
     observableValue.addObserver(setCurrent);
-    observableValue.notifyObservers({ id: "2" });
+    observableValue.current = { id: "2" };
     expect(current).toEqual({ id: "2" });
   });
 
@@ -77,7 +77,7 @@ describe("Observable", () => {
     expect(current).toEqual({ id: "1" });
     observableValue.addObserver(setCurrent);
     observableValue.removeObserver(setCurrent);
-    observableValue.notifyObservers({ id: "2" });
+    observableValue.current = { id: "2" };
     expect(current).toEqual({ id: "1" });
   });
 });

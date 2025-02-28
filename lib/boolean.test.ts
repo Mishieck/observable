@@ -25,7 +25,7 @@ describe("$Boolean", () => {
 
     expect(Boolean(current)).toEqual(true);
     observableBoolean.addObserver(setCurrent);
-    observableBoolean.notifyObservers(false);
+    observableBoolean.current = false;
     expect(current).toEqual(false);
   });
 
@@ -40,7 +40,7 @@ describe("$Boolean", () => {
     expect(Boolean(current)).toEqual(true);
     observableBoolean.addObserver(setCurrent);
     observableBoolean.removeObserver(setCurrent);
-    observableBoolean.notifyObservers(false);
+    observableBoolean.current = false;
     expect(Boolean(current)).toEqual(true);
   });
 });

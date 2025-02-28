@@ -26,7 +26,8 @@ export class Observable<Value> implements ObservableInterface<Value> {
   }
 
   set current(value: Value) {
-    this.notifyObservers(value);
+    this._current = value;
+    this.notifyObservers();
   }
 
   addObserver(observe: Observer<Value>) {
@@ -37,8 +38,7 @@ export class Observable<Value> implements ObservableInterface<Value> {
     this.observers.delete(observe);
   }
 
-  notifyObservers(value: Value) {
-    this._current = value;
-    for (const notify of this.observers) notify(value);
+  notifyObservers() {
+    for (const notify of this.observers) notify(this._current);
   }
 }
