@@ -1,44 +1,52 @@
-export type Observer<Value> = (value: Value) => void | Promise<void>;
-
-export type ObservableInterface<Value> = {
-  current: Value;
-  addObserver: (observe: Observer<Value>) => void;
-  removeObserver: (observe: Observer<Value>) => void;
-  notifyObservers: (value: Value) => void;
+export type Event<Name extends string, Payload> = {
+  name: Name;
+  payload: Payload;
 };
 
-export type ObservablePrimitiveInterface<Value, PrimitiveValue> =
-  & ObservableInterface<Value>
-  & {
-    toPrimitive: () => PrimitiveValue;
-  };
+export type Observer<Ev extends Event<string, unknown>> = (event: Ev) => void;
 
-export class Observable<Value> implements ObservableInterface<Value> {
-  private _current: Value;
-  private observers = new Set<Observer<Value>>();
+export type Observers<
+  EventName extends string,
+  Events extends Record<EventName, unknown>,
+> = { [Key in EventName]: Set<Observer<Event<Key, Events[Key]>>> };
 
-  constructor(value: Value) {
-    this._current = value;
+export class Observable<
+  EventName extends string,
+  Events extends Record<EventName, unknown>,
+> {
+  #observers: Observers<EventName, Events>;
+
+  constructor(eventNames: Array<EventName>) {
+    this.#observers = eventNames
+      .reduce(
+        (observers, name) => ({
+          ...observers,
+          [name]: new Set(),
+        }),
+        {} as Partial<Observers<EventName, Events>>,
+      ) as Observers<EventName, Events>;
   }
 
-  get current() {
-    return this._current;
+  addObserver<Ev extends EventName>(
+    event: Ev,
+    observer: Observer<Event<Ev, Events[Ev]>>,
+  ): void {
+    this.#observers[event].add(observer);
   }
 
-  set current(value: Value) {
-    this._current = value;
-    this.notifyObservers();
+  removeObserver<Ev extends EventName>(
+    event: Ev,
+    observer: Observer<Event<Ev, Events[Ev]>>,
+  ): void {
+    this.#observers[event].delete(observer);
   }
 
-  addObserver(observe: Observer<Value>) {
-    if (!this.observers.has(observe)) this.observers.add(observe);
-  }
-
-  removeObserver(observe: Observer<Value>) {
-    this.observers.delete(observe);
-  }
-
-  notifyObservers() {
-    for (const notify of this.observers) notify(this._current);
+  notifyObservers<Ev extends EventName>(
+    event: Ev,
+    payload: Events[Ev],
+  ): void {
+    for (const notify of this.#observers[event]) {
+      notify({ name: event, payload });
+    }
   }
 }

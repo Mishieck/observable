@@ -1,83 +1,41 @@
 import { describe, it } from "@std/testing";
 import { expect } from "@std/expect";
-import { Observable, Observer } from "./observable.ts";
-
-describe("ObservableValue", () => {
-  it("should create observable", () => {
-    const observableBoolean = new Observable(true);
-    expect(observableBoolean.current).toEqual(true);
-  });
-
-  it("should observe value", () => {
-    const observableBoolean = new Observable(true);
-    let current = observableBoolean.current;
-
-    const setCurrent: Observer<boolean> = (value) => {
-      current = value;
-    };
-
-    expect(current).toEqual(true);
-    observableBoolean.addObserver(setCurrent);
-    observableBoolean.current = false;
-    expect(current).toEqual(false);
-  });
-
-  it("should remove observers", () => {
-    const observableBoolean = new Observable(true);
-    let current = observableBoolean.current;
-
-    const setCurrent: Observer<boolean> = (value) => {
-      current = value;
-    };
-
-    expect(current).toEqual(true);
-    observableBoolean.addObserver(setCurrent);
-    observableBoolean.removeObserver(setCurrent);
-    observableBoolean.current = false;
-    expect(current).toEqual(true);
-  });
-});
+import { type Event, Observable, type Observer } from "./observable.ts";
 
 describe("Observable", () => {
-  type User = { id: string };
+  it("should add observers", () => {
+    const observable = new Observable<"update", { update: boolean }>([
+      "update",
+    ]);
 
-  class ObservableUser extends Observable<User> {
-    constructor(user: User) {
-      super(user);
-    }
-  }
+    type BooleanEvent = Event<"update", boolean>;
+    let value = false;
 
-  it("should create observable", () => {
-    const observableValue = new ObservableUser({ id: "1" });
-    expect(observableValue.current).toEqual({ id: "1" });
-  });
+    const observer: Observer<BooleanEvent> = ({ payload }) => value = payload;
+    observable.addObserver("update", observer);
 
-  it("should observe value", () => {
-    const observableValue = new ObservableUser({ id: "1" });
-    let current = observableValue.current;
+    observable.notifyObservers("update", true);
+    expect(value).toEqual(true);
 
-    const setCurrent: Observer<User> = (value) => {
-      current = value;
-    };
-
-    expect(current).toEqual({ id: "1" });
-    observableValue.addObserver(setCurrent);
-    observableValue.current = { id: "2" };
-    expect(current).toEqual({ id: "2" });
+    observable.notifyObservers("update", false);
+    expect(value).toEqual(false);
   });
 
   it("should remove observers", () => {
-    const observableValue = new ObservableUser({ id: "1" });
-    let current = observableValue.current;
+    const observable = new Observable<"update", { update: boolean }>([
+      "update",
+    ]);
 
-    const setCurrent: Observer<User> = (value) => {
-      current = value;
-    };
+    type BooleanEvent = Event<"update", boolean>;
+    let value = false;
+    const observer: Observer<BooleanEvent> = ({ payload }) => value = payload;
 
-    expect(current).toEqual({ id: "1" });
-    observableValue.addObserver(setCurrent);
-    observableValue.removeObserver(setCurrent);
-    observableValue.current = { id: "2" };
-    expect(current).toEqual({ id: "1" });
+    observable.addObserver("update", observer);
+    observable.notifyObservers("update", true);
+    expect(value).toEqual(true);
+
+    observable.removeObserver("update", observer);
+    observable.notifyObservers("update", false);
+    expect(value).toEqual(true);
   });
 });
