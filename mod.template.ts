@@ -1,5 +1,5 @@
 /**
- * A JavaScript library that provides classes that implements the Observer
+ * A JavaScript library that provides classes that implement the Observer
  * Pattern.
  *
  * @example
