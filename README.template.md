@@ -7,19 +7,19 @@ A library that provides classes that implement the Observer Pattern.
 ### Deno
 
 ```ts
-deno install jsr:@mishieck/observable
+deno add jsr:@mishieck/observable
 ```
 
 ### NPM
 
 ```ts
-npx jsr install @mishieck/observable 
+npx jsr add @mishieck/observable 
 ```
 
 ### Bun
 
 ```ts
-bun x jsr install @mishieck/observable 
+bun x jsr add @mishieck/observable 
 ```
 
 ## Usage
