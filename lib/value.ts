@@ -1,76 +1,75 @@
 import { type Event, Observable, type Observer } from "./observable.ts";
 
-/** The only event of primitive values. */
-export type PrimitiveEvent = "update";
+/** The only event of values. */
+export type ValueEvent = "update";
 
-/** The observer of a primitive observable value. */
-export type PrimitiveObserver<Value> = (value: Value) => void;
+/** The observer of a observable value. */
+export type ValueObserver<Value> = (value: Value) => void;
 
 /** A function that derives one value from another. */
 export type Deriver<Value, DerivedValue> = (value: Value) => DerivedValue;
 
-export class Primitive<Value>
-  extends Observable<PrimitiveEvent, Record<PrimitiveEvent, Value>> {
-  /** The current primitive value. This is the value that gets observed. */
-  #value: Value;
+export class Value<Value>
+  extends Observable<ValueEvent, Record<ValueEvent, Value>> {
+  /** The current value. This is the value that gets observed. */
+  #current: Value;
 
   /**
-   * A map of observers. The keys are the `PrimitiveObserver`s and the values
-   * are `Observer`s. The `Observer`s wrap `PrimitiveObserver`s to make them
+   * A map of observers. The keys are the `ValueObserver`s and the values
+   * are `Observer`s. The `Observer`s wrap `ValueObserver`s to make them
    * compatible with `Observable`.
    */
   #observers = new Map<
-    PrimitiveObserver<Value>,
-    Observer<Event<PrimitiveEvent, Value>>
+    ValueObserver<Value>,
+    Observer<Event<ValueEvent, Value>>
   >();
 
   constructor(value: Value) {
     super(["update"]);
-    this.#value = value;
+    this.#current = value;
   }
 
   /**
-   * The current primitive value.
+   * The current value.
    */
   get current(): Value {
-    return this.#value;
+    return this.#current;
   }
 
   /**
-   * The current primitive value. Setting this value triggers an event emission.
+   * The current value. Setting this value triggers an event emission.
    */
   set current(value: Value) {
-    this.#value = value;
+    this.#current = value;
     this.notify(value);
   }
 
-  /** Subscribes a `PrimitiveObserver`. */
-  observe(observe: PrimitiveObserver<Value>) {
+  /** Subscribes a `ValueObserver`. */
+  observe(observe: ValueObserver<Value>) {
     this.addObserver("update", ({ payload }) => observe(payload));
   }
 
-  /** Unsubscribes a `PrimitiveObserver`. */
-  unobserve(observe: PrimitiveObserver<Value>) {
+  /** Unsubscribes a `ValueObserver`. */
+  unobserve(observe: ValueObserver<Value>) {
     const observer = this.#observers.get(observe);
     if (!observer) return;
     this.removeObserver("update", observer);
     this.#observers.delete(observe);
   }
 
-  /** Emits the 'update' event to `PrimitiveObservers`. */
+  /** Emits the 'update' event to `ValueObservers`. */
   notify(value: Value) {
     this.notifyObservers("update", value);
   }
 }
 
-/** Derives a primitive value from another primitive value. */
-export class DerivedPrimitive<BaseValue, DerivedValue>
-  extends Primitive<DerivedValue> {
-  #baseValue: Primitive<BaseValue>;
+/** Derives a value from another value. */
+export class DerivedValue<BaseValue, DerivedValue> extends Value<DerivedValue> {
+  #baseValue: Value<BaseValue>;
   #derive: Deriver<BaseValue, DerivedValue>;
 
   constructor(
-    baseValue: Primitive<BaseValue>,
+    baseValue: Value<BaseValue>,
     derive: Deriver<BaseValue, DerivedValue>,
   ) {
     super(derive(baseValue.current));
@@ -81,7 +80,7 @@ export class DerivedPrimitive<BaseValue, DerivedValue>
 
   /**
    * The derived current value. The `Deriver` is used to derive the current
-   * value from the `Primitive` value used.
+   * value from the `Value` value used.
    */
   override get current(): DerivedValue {
     return this.#derive(this.#baseValue.current);
